@@ -1,0 +1,7 @@
+{
+  "name": "Recording without the user notice",
+  "short-name": "WebRTC abuse",
+  "background_color": "#fff",
+  "description": "Just a simple test to check if it is possible to get around the recording notification",
+  "lang": "en"
+}
