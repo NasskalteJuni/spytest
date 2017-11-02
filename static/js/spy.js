@@ -21,7 +21,7 @@ function showMessage(text){
     li.setAttribute('class','message card');
     let section = document.createElement('section');
     let footer = document.createElement('footer');
-    footer.innerHTML = (new Date()).toTimeString()
+    footer.innerHTML = (new Date()).toTimeString();
     let article = document.createElement('article');
     article.innerHTML = text;
     li.appendChild(section);
@@ -44,7 +44,7 @@ function visibilityChanged() {
         });
     }else{
         showMessage('Tab is now in Foreground');
-        let recorder = getRecorder().then(recorder => {
+        getRecorder().then(recorder => {
             recorder.stop();
         });
     }
