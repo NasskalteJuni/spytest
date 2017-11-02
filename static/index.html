@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/6.0.0/adapter.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+</head>
+<body>
+<header class="page-header centered">
+    <h1 class="headline">
+        Recording without the user noticing it
+    </h1>
+</header>
+<main class="container">
+    <div class="row">
+        <article>
+            <h1>Preamble</h1>
+            On Browsers implemented according to the W3C spec there is no way to record without the browser showing no sign of it.
+            This page does not show a technical exploit of WebRTC or a way to avoid the signs of showing up but instead ask,
+            if there is a way to still record or to start to record <strong>while</strong> the user cannot see them.
+            The user still has to click once, to allow the web app to access the microphone and the page still must stay open
+            (but this should not be the problem since some users including me have multiple tabs open and leave them open for a few days while working on something the tab is related to)
+        </article>
+        <article>
+            <h1>Situation / Problem</h1>
+            I want to test if it is possible, to access the cam and microphone without the user noticing it.
+            WebRTC was implemented with concern to users being spied on.
+            Browsers therefore always show, when there is a tab that accesses local media devices by showing a big red dot beside the favicon that marks a current record.
+            On a desktop device, this may be highly visible since all tabs are beside each other.
+            On a mobile device, they are often displayed behind each other.
+            Therefore, a user should not notice if a tab records on mobile devices while being in the background.
+            Additionally, https-pages ask just once to get the users permission, subsequent calls to getUserMedia are accepted automatically if the user agreed.
+        </article>
+        <article>
+            <h1>Exploitability</h1>
+            First of all: This is not a security exploit but possibly a bad design choice that would result in a user not being aware of access to its local media.
+            The recordings could be sent over Peer Connection to a MCU or over a Websocket to the server.
+            Recordings on this page just stay on this page (but if it works, it would be possible to send them to a server)
+        </article>
+        <article>
+            <h1>Results</h1>
+            Not Tested for different platforms yet
+        </article>
+    </div>
+    <div class="row">
+        <audio id="exampleAudio" src="" controls></audio>
+    </div>
+    <div class="row">
+        <ul id="messages">
+
+        </ul>
+    </div>
+    <div class="row">
+        <h1>Code used</h1>
+        <p>
+            I used the new <a href="https://www.w3.org/TR/2013/REC-page-visibility-20131029/">Page visibility API</a> defined by the W3C to check if the tap is in Foreground or Background.
+            Alternatively, you could use the focus and blur event listeners on the document.
+        </p>
+        <pre id="code" class="code"></pre>
+        <script>
+            $('#code').load(window.origin+'/spytest/static/js/spy.js')
+        </script>
+    </div>
+</main>
+<script src="./js/spy.js"></script>
+</body>
+</html>
