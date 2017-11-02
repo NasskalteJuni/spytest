@@ -20,6 +20,18 @@ main>.row{
     margin: 5em 0;
 }
 
+.btn{
+    padding: 1em;
+    color: white;
+    background-color: #d57eeb;
+    transition: background-color ease 1s;
+}
+
+.btn:active, .btn:focus, .btn:hover{
+    color: white;
+    background-color: #fccb90;
+}
+
 .centered{
     display: flex;
     align-items: center;

@@ -1,7 +1,11 @@
+// local microphone stream and recorder on that stream
 let mediaStream = null;
 let mediaRecorder = null;
+// elements to display output
 let exampleAudio = document.getElementById('exampleAudio');
 let messageList = document.getElementById('messages');
+let justifyButton = document.getElementById('justifyButton');
+// object to store recorded data in with utility functions
 let sink = {
     _chunks: [],
     getDataAsBlob(){
@@ -15,7 +19,22 @@ let sink = {
     }
 };
 document.addEventListener("visibilitychange", visibilityChanged);
+justifyButton.addEventListener("click", function(){
+    showMessage('Accessing (justified and wanted) the users microphone');
+    getRecorder().then(_=> {
+        let timeout = setTimeout(_=> {
+            showMessage('Now the user does not want to access the microphone anymore and "closes" it');
+            clearTimeout(timeout);
+        }, 5000);
+    });
+});
 
+// helper methods:
+
+/**
+ * display text on page (with the date)
+ * @param text the text to show
+ * */
 function showMessage(text){
     let li = document.createElement('li');
     li.setAttribute('class','message card');
@@ -30,9 +49,12 @@ function showMessage(text){
     messageList.insertBefore(li, messageList.firstChild);
 }
 
+/**
+ * Event handler function that switches between recording when the tab is not in foreground and to normal, not recording when the user views at the tab directly
+ * */
 function visibilityChanged() {
     if(document.hidden){
-        showMessage('Tab is now in Background');
+        showMessage('Tab is now in Background - allow recording');
         getRecorder().then(recorder => {
             recorder.start();
             recorder.ondataavailable = sink.getRecordFunction();
@@ -43,13 +65,17 @@ function visibilityChanged() {
             }
         });
     }else{
-        showMessage('Tab is now in Foreground');
+        showMessage('Tab is now in Foreground - hide all signs of recording');
         getRecorder().then(recorder => {
             recorder.stop();
         });
     }
 }
 
+/**
+ * Singleton function to get a microphone audio stream
+ * @return Promise returns a promise that resolves to a stream or an error that occurred getting the user media
+ * */
 function getMedia(){
     if(mediaStream){
         return Promise.resolve(mediaStream);
@@ -64,6 +90,10 @@ function getMedia(){
     }
 }
 
+/**
+ * Singleton function to get a recorder on the microphone stream
+ * @return Promise returns a promise that resolves with a media recorder that records the local microphone stream
+ * */
 function getRecorder(){
     if(mediaRecorder){
         return Promise.resolve(mediaRecorder);
@@ -75,6 +105,9 @@ function getRecorder(){
     }
 }
 
+/**
+ * Resets the streams and users so that the page is not recording any more
+ * */
 function clear(){
     if(mediaStream) mediaStream.getAudioTracks().forEach(track => {
         if(track.stop) track.stop()
