@@ -80,3 +80,11 @@ header.page-header>.headline{
     border-bottom: solid white thin;
     text-shadow: 0 0 25px rgba(20,20,20,0.3);
 }
+
+.card section{
+    font-size: 1.2em;
+}
+
+.card footer{
+    font-size: 0.6em;
+}

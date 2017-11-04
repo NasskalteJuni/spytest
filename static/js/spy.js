@@ -1,8 +1,7 @@
 // local microphone stream and recorder on that stream
 let mediaStream = null;
 let mediaRecorder = null;
-// elements to display output
-let exampleAudio = document.getElementById('exampleAudio');
+// elements to display output or receive input
 let messageList = document.getElementById('messages');
 let justifyButton = document.getElementById('justifyButton');
 // object to store recorded data in with utility functions
@@ -15,62 +14,68 @@ let sink = {
         return window.URL.createObjectURL(this.getDataAsBlob());
     },
     getRecordFunction(){
+        this._chunks = [];
         return e => this._chunks.push(e.data);
     }
 };
-document.addEventListener("visibilitychange", visibilityChanged);
+
+// the user must have some reason to give the page at least one time access to his microphone
+// this button is just a placeholder for this useful function that the user wants to use.
+// it just records 1 second and stops then, like a user that now does not want to use this function any more
 justifyButton.addEventListener("click", function(){
-    showMessage('Accessing (justified and wanted) the users microphone');
-    getRecorder().then(_=> {
-        let timeout = setTimeout(_=> {
-            showMessage('Now the user does not want to access the microphone anymore and "closes" it');
-            clearTimeout(timeout);
-        }, 5000);
-    });
+    startRecording();
+    showMessage("The user uses the microphone (desired by the user)");
+    let delay = setTimeout(function(){
+        stopRecording();
+        showMessage("The user stops using the microphone");
+        clearTimeout(delay);
+    },1000);
 });
 
-// helper methods:
+// when the window is maximized, stop to hide that you were recording
+window.onmaximize = stopRecording;
+
+// when the window gets minimized, start to record without the user noticing it
+window.onminimize = startRecording;
 
 /**
- * display text on page (with the date)
- * @param text the text to show
+ * start the designated recorder
  * */
-function showMessage(text){
-    let li = document.createElement('li');
-    li.setAttribute('class','message card');
-    let section = document.createElement('section');
-    let footer = document.createElement('footer');
-    footer.innerHTML = (new Date()).toTimeString();
-    let article = document.createElement('article');
-    article.innerHTML = text;
-    li.appendChild(section);
-    section.appendChild(article);
-    section.appendChild(footer);
-    messageList.insertBefore(li, messageList.firstChild);
+function startRecording(){
+    console.log('startRecording');
+    getRecorder().then(recorder => {
+        console.log('getRecorder then');
+        showMessage('start recording now');
+        recorder.start();
+        recorder.ondataavailable = sink.getRecordFunction();
+        recorder.onstop = function(){
+            console.log('onstop called');
+            showAudio(sink.getDataAsSrcUrl());
+            showMessage('Recorded data is set to audio element');
+            clear();
+        }
+    });
 }
 
 /**
- * Event handler function that switches between recording when the tab is not in foreground and to normal, not recording when the user views at the tab directly
+ * stop the designated recorder
  * */
-function visibilityChanged() {
-    if(document.hidden){
-        showMessage('Tab is now in Background - allow recording');
-        getRecorder().then(recorder => {
-            recorder.start();
-            recorder.ondataavailable = sink.getRecordFunction();
-            recorder.onstop = function(){
-                exampleAudio.src = sink.getDataAsSrcUrl();
-                showMessage('Recorded while in Background, click on audio to hear recordings');
-                clear();
+function stopRecording(){
+    console.log('stopRecording');
+    getRecorder().then(recorder => {
+        console.log('getRecorder then');
+        showMessage('Recorder stops');
+        let attempts = 10;
+        let poll = setInterval(function () {
+            if (attempts <= 0) {
+                if (recorder.state === 'recording') recorder.stop();
+                clearInterval(poll);
             }
-        });
-    }else{
-        showMessage('Tab is now in Foreground - hide all signs of recording');
-        getRecorder().then(recorder => {
-            recorder.stop();
-        });
-    }
+            attempts--;
+        }, 500);
+    });
 }
+
 
 /**
  * Singleton function to get a microphone audio stream
@@ -109,9 +114,48 @@ function getRecorder(){
  * Resets the streams and users so that the page is not recording any more
  * */
 function clear(){
+    if(mediaRecorder && mediaRecorder.state === 'recording'){
+        mediaRecorder.stop();
+    }
     if(mediaStream) mediaStream.getAudioTracks().forEach(track => {
         if(track.stop) track.stop()
     });
     mediaRecorder = null;
     mediaStream = null;
+}
+
+
+// ---------------- only utility functions down here ----------------------
+
+/**
+ * display text on page (with the date)
+ * @param content the text to show
+ * */
+function showMessage(content){
+    let li = document.createElement('li');
+    li.setAttribute('class','message card');
+    let section = document.createElement('section');
+    let footer = document.createElement('footer');
+    footer.innerHTML = (new Date()).toLocaleTimeString('de-De',{hour: '2-digit', minute: '2-digit', second: '2-digit'});
+    let article = document.createElement('article');
+    if(content instanceof Node){
+        article.appendChild(content);
+    }else{
+        article.innerHTML = content;
+    }
+    li.appendChild(section);
+    section.appendChild(article);
+    section.appendChild(footer);
+    messageList.insertBefore(li, messageList.firstChild);
+}
+
+/**
+ * display an audio file as message
+ * @param url the url as String to the audio file source
+ * */
+function showAudio(url){
+    let audio = document.createElement('audio');
+    audio.setAttribute("controls","");
+    audio.setAttribute("src",url);
+    showMessage(audio);
 }

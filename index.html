@@ -11,6 +11,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#d57eeb">
     <link rel="manifest" href="./manifest.json">
+    <script src="/spytest/static/js/minimize.js"></script>
 </head>
 <body>
 <header class="page-header centered">
@@ -21,6 +22,11 @@
 <main class="container">
     <div class="row">
         <button class="btn btn-default col-xs-4" id="justifyButton"> Allow Access to Media </button><div class="col-xs-8" style="display: flex; align-items: center; height: 3em;">Click this button as a user would do that wants to use his microphone for voice search or something else. Scroll down to see the change messages</div>
+    </div>
+    <div class="row">
+        <ul id="messages">
+
+        </ul>
     </div>
     <div class="row">
         <article>
@@ -36,10 +42,21 @@
             I want to test if it is possible, to access the cam and microphone without the user noticing it.
             WebRTC was implemented with concern to users being spied on.
             Browsers therefore always show, when there is a tab that accesses local media devices by showing a big red dot beside the favicon that marks a current record.
-            On a desktop device, this may be highly visible since all tabs are beside each other.
-            On a mobile device, they are often displayed behind each other.
-            Therefore, a user should not notice if a tab records on mobile devices while being in the background.
-            Additionally, https-pages ask just once to get the users permission, subsequent calls to getUserMedia are accepted automatically if the user agreed.
+            <ol>
+                <li>
+                    On a desktop device, this may be highly visible since all tabs are beside each other.
+                    On a mobile device, they are often displayed behind each other.
+                    Therefore, a user should not notice if a tab records on mobile devices while being in the background.
+                </li>
+                <li>
+                    A desktop browser cannot show any signs of microphone access, when the browser window is minimized.
+                    Since the only display is on the tabs, not showing the tabs hides recording activity to the user.
+                </li>
+                <li>
+                    Additionally, https-pages ask just once to get the users permission, subsequent calls to getUserMedia are accepted automatically if the user agreed.
+                </li>
+            </ol>
+
         </article>
         <article>
             <h1>Exploitability</h1>
@@ -49,22 +66,33 @@
         </article>
         <article>
             <h1>Results</h1>
-            Not Tested for different platforms yet
+            I tested my ideas about recording and hiding this activity.
+            <ol>
+                <li>
+                    While the mobile browser never shows any tab symbol like its desktop equivalent, the smartphone shows on the system menu bar that the microphone is in use.
+                    This makes it impossible to record while the user is completely unaware of it and has no chance to see any notifications.
+                </li>
+                <li>
+                    There is no sign of a recording while the window is minimized but when the user maximizes his window again, the browsers still show the recording icon for a few seconds.
+                    This makes it possible that the user notices the unwanted access to his microphone. Even if it may reduce the risk, this would not be enough.
+                </li>
+                <li>
+                    Some browsers still ask every time getUserMedia is called
+                </li>
+            </ol>
         </article>
-    </div>
-    <div class="row">
-        <audio id="exampleAudio" src="" controls></audio>
-    </div>
-    <div class="row">
-        <ul id="messages">
-
-        </ul>
+        <article>
+            <h1>Consequences</h1>
+            Sometimes, it is claimed that pages like facebook and google may listen to conversations over the users audio inputs.
+            On a webpage, this would only be possible if the web app calls getUserMedia. My tests show the limited options to use this API for these intents.
+            It would be way to probable that at least one user notices a sign of unwanted device access and the reputation of the web apps company would be ruined
+        </article>
     </div>
     <div class="row">
         <h1>Code used</h1>
         <p>
-            I used the new <a href="https://www.w3.org/TR/2013/REC-page-visibility-20131029/">Page visibility API</a> defined by the W3C to check if the tap is in Foreground or Background.
-            Alternatively, you could use the focus and blur event listeners on the document.
+            For the tab switching test I used the <a href="https://www.w3.org/TR/2013/REC-page-visibility-20131029/">Page visibility API</a> defined by the W3C to check if the tab is in Foreground or Background.
+            To test if the window is minimized, I had to use the outerHeight of the window and poll if it changed to a value that indicated that the user minimized the browser window.
         </p>
         <pre id="code" class="code"></pre>
         <script>
