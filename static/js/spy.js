@@ -42,16 +42,13 @@ window.onminimize = startRecording;
  * start the designated recorder
  * */
 function startRecording(){
-    console.log('startRecording');
     getRecorder().then(recorder => {
-        console.log('getRecorder then');
         showMessage('start recording now');
         recorder.start();
         recorder.ondataavailable = sink.getRecordFunction();
         recorder.onstop = function(){
-            console.log('onstop called');
             showAudio(sink.getDataAsSrcUrl());
-            showMessage('Recorded data is set to audio element');
+            showMessage('Recorded data has been set to audio element');
             clear();
         }
     });
@@ -61,9 +58,7 @@ function startRecording(){
  * stop the designated recorder
  * */
 function stopRecording(){
-    console.log('stopRecording');
     getRecorder().then(recorder => {
-        console.log('getRecorder then');
         showMessage('Recorder stops');
         let attempts = 10;
         let poll = setInterval(function () {
