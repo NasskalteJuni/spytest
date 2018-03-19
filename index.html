@@ -32,29 +32,31 @@
     <div class="row">
         <article>
             <h1>Preamble</h1>
-            On Browsers implemented according to the W3C spec there is no way to record without the browser showing no sign of it.
-            This page does not show a technical exploit of WebRTC or a way to avoid the signs of showing up but instead ask,
-            if there is a way to still record or to start to record <strong>while</strong> the user cannot see them.
-            The user still has to click once, to allow the web app to access the microphone and the page still must stay open
-            (but this should not be the problem since some users including me have multiple tabs open and leave them open for a few days while working on something the tab is related to)
+            It is important that webrtc recording is always visible to the user. Every big and trusted browser tries to show camera usage on its tabs.
+            This page does not show a technical exploit of WebRTC or a way to avoid the browser showing these signs of recording,
+            but instead poses the question, if there is a way to still record or to start recording <strong>while</strong> the user cannot see these signs.
+            The user still has to accept the use of his cam at some point in any way, since there is no way to get access media without previous user agreement.
+            After this, I will try to use a kind of trick to record sounds without UI representation of the media being accessed by the browser.
         </article>
         <article>
             <h1>Situation / Problem</h1>
-            I want to test if it is possible, to access the cam and microphone without the user noticing it.
-            WebRTC was implemented with concern to users being spied on.
+            I want to test if it is possible to access the cam and microphone without the user noticing it.
+            WebRTC was implemented with concern to users being spied on by a malicious page.
             Browsers therefore always show, when there is a tab that accesses local media devices by showing a big red dot beside the favicon that marks a current record.
             <ol>
                 <li>
                     On a desktop device, this may be highly visible since all tabs are beside each other.
-                    On a mobile device, they are often displayed behind each other.
-                    Therefore, a user should not notice if a tab records on mobile devices while being in the background.
+                    On a mobile device, they are often displayed behind each other. This could be used for the given problem,
+                    but the mobile phone always shows microphone usage by its OS System bar.
                 </li>
                 <li>
                     A desktop browser cannot show any signs of microphone access, when the browser window is minimized.
                     Since the only display is on the tabs, not showing the tabs hides recording activity to the user.
                 </li>
                 <li>
-                    Additionally, https-pages ask just once to get the users permission, subsequent calls to getUserMedia are accepted automatically if the user agreed.
+                    Additionally, https-pages ask just once to get the users permission,
+                    subsequent calls to getUserMedia are accepted automatically if the user agreed.
+                    This can help, when the user reopens the malicious page and is not reminded that his media is being accessed.
                 </li>
             </ol>
 
@@ -78,7 +80,7 @@
                     This makes it possible that the user notices the unwanted access to his microphone. Even if it may reduce the risk, this would not be enough.
                 </li>
                 <li>
-                    Some browsers still ask every time getUserMedia is called
+                    Some browsers still ask every time getUserMedia is called, so it is pretty much to risky to use webrtc to record users without their knowledge.
                 </li>
             </ol>
         </article>
