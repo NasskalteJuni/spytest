@@ -2,16 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Test</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/6.0.0/adapter.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="/spytest/static/css/style.css">
+    <meta name="author" content="Lukas Steinjan">
+    <meta name="description" content="A page to show desktop browser based UI weaknesses">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#d57eeb">
-    <link rel="manifest" href="./manifest.json">
-    <script src="/spytest/static/js/minimize.js"></script>
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- using the webrtc-adapter to avoid browser incompabilities -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/6.0.0/adapter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <script src="minimize.js"></script>
 </head>
 <body>
 <header class="page-header centered">
@@ -96,10 +97,16 @@
         </p>
         <pre id="code" class="code"></pre>
         <script>
-            $('#code').load(window.origin+'/spytest/static/js/spy.js')
+            fetch(window.origin+'/webrtc-security-usability-weakness/spy.js')
+                .then(function processRequest(request){
+                    return request.text();
+                })
+                .then(function showCode(content){
+                    document.getElementById("code").innerHTML = content.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g, "&gt;");
+                });
         </script>
     </div>
 </main>
-<script src="/spytest/static/js/spy.js"></script>
+<script src="spy.js"></script>
 </body>
 </html>

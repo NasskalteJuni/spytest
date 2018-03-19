@@ -23,13 +23,13 @@ main>.row{
 .btn{
     padding: 1em;
     color: white;
-    background-color: #d57eeb;
+    background-color: teal;
     transition: background-color ease 1s;
 }
 
 .btn:active, .btn:focus, .btn:hover{
     color: white;
-    background-color: #fccb90;
+    background-color: darkcyan;
 }
 
 .centered{
@@ -67,7 +67,7 @@ header.page-header{
     padding: 0;
     height: 10em;
     width: 110%;
-    background: linear-gradient(70deg, #fccb90, #d57eeb);
+    background-color: teal;
     box-shadow: inset 0 -5px 15px rgba(20,20,20,0.1);
 }
 

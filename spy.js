@@ -1,21 +1,22 @@
 // local microphone stream and recorder on that stream
-let mediaStream = null;
-let mediaRecorder = null;
+var mediaStream = null;
+var mediaRecorder = null;
 // elements to display output or receive input
-let messageList = document.getElementById('messages');
-let justifyButton = document.getElementById('justifyButton');
+var messageList = document.getElementById('messages');
+var justifyButton = document.getElementById('justifyButton');
 // object to store recorded data in with utility functions
-let sink = {
+var sink = {
     _chunks: [],
-    getDataAsBlob(){
+    getDataAsBlob: function(){
         return new Blob(this._chunks, { 'type' : 'audio/ogg; codecs=opus' });
     },
-    getDataAsSrcUrl(){
+    getDataAsSrcUrl: function(){
         return window.URL.createObjectURL(this.getDataAsBlob());
     },
-    getRecordFunction(){
+    getRecordFunction: function(){
         this._chunks = [];
-        return e => this._chunks.push(e.data);
+        var that = this;
+        return function(e){ that._chunks.push(e.data) };
     }
 };
 
@@ -25,7 +26,7 @@ let sink = {
 justifyButton.addEventListener("click", function(){
     startRecording();
     showMessage("The user uses the microphone (desired by the user)");
-    let delay = setTimeout(function(){
+    var delay = setTimeout(function(){
         stopRecording();
         showMessage("The user stops using the microphone");
         clearTimeout(delay);
@@ -42,7 +43,7 @@ window.onminimize = startRecording;
  * start the designated recorder
  * */
 function startRecording(){
-    getRecorder().then(recorder => {
+    getRecorder().then(function record(recorder){
         showMessage('start recording now');
         recorder.start();
         recorder.ondataavailable = sink.getRecordFunction();
@@ -50,7 +51,7 @@ function startRecording(){
             showAudio(sink.getDataAsSrcUrl());
             showMessage('Recorded data has been set to audio element');
             clear();
-        }
+        };
     });
 }
 
@@ -58,10 +59,10 @@ function startRecording(){
  * stop the designated recorder
  * */
 function stopRecording(){
-    getRecorder().then(recorder => {
+    getRecorder().then(function finish(recorder){
         showMessage('Recorder stops');
-        let attempts = 10;
-        let poll = setInterval(function () {
+        var attempts = 10;
+        var poll = setInterval(function () {
             if (attempts <= 0) {
                 if (recorder.state === 'recording') recorder.stop();
                 clearInterval(poll);
@@ -83,7 +84,7 @@ function getMedia(){
         return navigator.mediaDevices.getUserMedia({
             audio: true,
             video: false
-        }).then(stream => {
+        }).then(function saveStreamToVar(stream){
             mediaStream = stream;
             return stream;
         });
@@ -98,7 +99,7 @@ function getRecorder(){
     if(mediaRecorder){
         return Promise.resolve(mediaRecorder);
     }else{
-        return getMedia().then(stream => {
+        return getMedia().then(function saveRecorderToVar(stream){
             mediaRecorder = new MediaRecorder(stream);
             return mediaRecorder;
         });
@@ -112,7 +113,7 @@ function clear(){
     if(mediaRecorder && mediaRecorder.state === 'recording'){
         mediaRecorder.stop();
     }
-    if(mediaStream) mediaStream.getAudioTracks().forEach(track => {
+    if(mediaStream) mediaStream.getAudioTracks().forEach(function stopAllTracks(track){
         if(track.stop) track.stop()
     });
     mediaRecorder = null;
@@ -127,12 +128,12 @@ function clear(){
  * @param content the text to show
  * */
 function showMessage(content){
-    let li = document.createElement('li');
+    var li = document.createElement('li');
     li.setAttribute('class','message card');
-    let section = document.createElement('section');
-    let footer = document.createElement('footer');
+    var section = document.createElement('section');
+    var footer = document.createElement('footer');
     footer.innerHTML = (new Date()).toLocaleTimeString('de-De',{hour: '2-digit', minute: '2-digit', second: '2-digit'});
-    let article = document.createElement('article');
+    var article = document.createElement('article');
     if(content instanceof Node){
         article.appendChild(content);
     }else{
@@ -149,7 +150,7 @@ function showMessage(content){
  * @param url the url as String to the audio file source
  * */
 function showAudio(url){
-    let audio = document.createElement('audio');
+    var audio = document.createElement('audio');
     audio.setAttribute("controls","");
     audio.setAttribute("src",url);
     showMessage(audio);
